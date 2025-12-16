@@ -1,0 +1,135 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block title %}{% if category %}Edit Category{% else %}Add New Category{% endif %}{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/edit_category.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="edit-category-page">
+    <div class="admin-card edit-category-card">
+        <div class="form-header">
+            <h1 class="form-title">
+                {% if category %}Edit Category: {{ category.category_name }}{% else %}Add New Category{% endif %}
+            </h1>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_category_name" class="form-label">Category Name</label>
+                {{ form.category_name }}
+            </div>
+
+            <div class="manage-items-grid">
+                <!-- Assigned Items Column -->
+                <div class="item-column">
+                    <div class="column-header">
+                        <span>Assigned Menu Items (<span id="assigned-count">{{ assigned_items|length }}</span>)</span>
+                    </div>
+                    <ul class="item-list" id="assigned-list">
+                        {% for item in assigned_items %}
+                            <li class="item-row" data-id="{{ item.id }}">
+                                <div class="item-info">
+                                    <div class="item-initial" style="background: #F4C430;">{{ item.name|slice:":2"|upper }}</div>
+                                    <span class="item-name">{{ item.name }}</span>
+                                </div>
+                                <button type="button" class="btn-action btn-remove" onclick="moveItem(this, 'available')">
+                                    <i class="fa-solid fa-minus"></i> Remove
+                                </button>
+                                <input type="hidden" name="assigned_items" value="{{ item.id }}">
+                            </li>
+                        {% empty %}
+                            <li class="item-row empty">No items assigned</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Available Items Column -->
+                <div class="item-column">
+                    <div class="column-header">
+                        <span>Assign More Items</span>
+                    </div>
+                    <div class="search-box">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" class="search-input" placeholder="Search Menu Items..." id="searchItems" onkeyup="filterItems()">
+                    </div>
+                    <ul class="item-list" id="available-list">
+                        {% for item in available_items %}
+                            <li class="item-row" data-id="{{ item.id }}">
+                                <div class="item-info">
+                                    <div class="item-initial" style="background: #ccc;">{{ item.name|slice:":2"|upper }}</div>
+                                    <span class="item-name">{{ item.name }}</span>
+                                </div>
+                                <button type="button" class="btn-action btn-add" onclick="moveItem(this, 'assigned')">
+                                    <i class="fa-solid fa-plus"></i> Add
+                                </button>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <a href="{% url 'categories' %}" class="btn btn-cancel">Cancel</a>
+                <button type="submit" class="btn btn-save">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function moveItem(btn, target) {
+        const itemRow = btn.closest('.item-row');
+        const id = itemRow.getAttribute('data-id');
+        
+        if (target === 'assigned') {
+            btn.innerHTML = '<i class="fa-solid fa-minus"></i> Remove';
+            btn.className = "btn-action btn-remove";
+            btn.setAttribute('onclick', "moveItem(this, 'available')");
+            
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'assigned_items';
+            input.value = id;
+            itemRow.appendChild(input);
+            
+            document.getElementById('assigned-list').appendChild(itemRow);
+        } else { // target === 'available'
+            btn.innerHTML = '<i class="fa-solid fa-plus"></i> Add';
+            btn.className = "btn-action btn-add";
+            btn.setAttribute('onclick', "moveItem(this, 'assigned')");
+            
+            itemRow.querySelector('input[name="assigned_items"]').remove();
+            document.getElementById('available-list').appendChild(itemRow);
+        }
+        updateCounts();
+    }
+
+    function updateCounts() {
+        const assignedList = document.getElementById('assigned-list');
+        const count = assignedList.querySelectorAll('.item-row:not(.empty)').length;
+        document.getElementById('assigned-count').innerText = count;
+
+        const emptyMessage = assignedList.querySelector('.empty');
+        if (count > 0 && emptyMessage) {
+            emptyMessage.style.display = 'none';
+        } else if (count === 0 && emptyMessage) {
+            emptyMessage.style.display = 'flex';
+        }
+    }
+
+    function filterItems() {
+        const term = document.getElementById('searchItems').value.toLowerCase();
+        const items = document.querySelectorAll('#available-list .item-row');
+        items.forEach(item => {
+            const text = item.querySelector('.item-name').innerText.toLowerCase();
+            item.style.display = text.includes(term) ? 'flex' : 'none';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', updateCounts);
+</script>
+{% endblock %}

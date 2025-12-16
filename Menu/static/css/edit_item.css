@@ -1,0 +1,204 @@
+.dashboard-content {
+  background-color: #550508;
+}
+.edit-menu-item-page {
+  width: 100%;
+  height: 100%;
+}
+
+.edit-item-card {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-header {
+  border-bottom: 2px solid #5d0c1d;
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-title {
+  color: #5d0c1d;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.toggle-switch input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #5d0c1d;
+  cursor: pointer;
+}
+
+.toggle-switch span {
+  color: #5d0c1d;
+  font-weight: bold;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-weight: bold;
+  color: #5d0c1d;
+  margin-bottom: 8px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: #f9f9f9;
+  box-sizing: border-box;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.file-input {
+  margin-bottom: 10px;
+}
+
+.image-preview-box {
+  width: 100%;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  margin-top: 10px;
+  background-color: #f5f5f5;
+}
+
+.image-preview-box span {
+  font-size: 0.9rem;
+}
+
+.btn-row {
+  display: flex;
+  padding-bottom: 50px;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.btn {
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.btn-cancel {
+  background: #ccc;
+  color: #333;
+  text-decoration: none;
+}
+
+.btn-cancel:hover {
+  background: #bbb;
+}
+
+.btn-save {
+  background: #F4C430;
+  color: #5d0c1d;
+}
+
+.btn-save:hover {
+  background: #e0b120;
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: span 1;
+  }
+}
+
+.admin-card {
+    background: white;
+    color: #333;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* Style the form inputs from Django forms */
+#id_name, #id_price, #id_description, #id_ingredients, #id_current_stock, #id_threshold_level {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    background: #f9f9f9;
+    box-sizing: border-box;
+}
+
+#id_category, #id_canteen {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    background: #f9f9f9;
+    box-sizing: border-box;
+}
+
+#id_is_available {
+    width: 20px;
+    height: 20px;
+    accent-color: #5d0c1d;
+    cursor: pointer;
+}
+
+#id_image_url {
+    margin-bottom: 10px;
+}

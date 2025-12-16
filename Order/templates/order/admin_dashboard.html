@@ -1,0 +1,77 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/admin_staff.css' %}">
+    <style>
+        /* Styles specific to Admin Dashboard Layout */
+        .dashboard-container {background-color: #550508; color: white;}
+        .main { background-color: #550508}
+        .admin-dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* Chart is wider than Top Sales */
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-card-admin { background: white; padding: 20px; border-radius: 12px; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .stat-card-admin h3 { color: #550508; font-weight: 800; margin-bottom: 5px; }
+        .stat-card-admin p { font-size: 2.2rem; font-weight: 800; margin: 0; }
+        .sales-chart { background: white; padding: 25px; border-radius: 12px; min-height: 300px; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .top-sales-card { background: white; padding: 25px; border-radius: 12px; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .top-sales-card h3 { color: #550508; font-weight: 800; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+        .top-sales-card li { padding: 8px 0; border-bottom: 1px dotted #eee; display: flex; justify-content: space-between; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h2 class="dashboard-title">Admin Dashboard</h2>
+
+    <!-- TOP STAT CARDS (These are now navigation links!) -->
+    <div class="stats-row-nav">
+
+        <!-- New Orders -->
+        <a href="{% url 'staff_orders' %}?tab=Pending" class="stat-card-nav {% if active_tab == 'Pending' %}active{% endif %}">
+            <h3 class="stat-title">New Orders</h3>
+            <p class="stat-number">{{ pending }}</p>
+        </a>
+
+        <!-- Preparing (Includes Ready) -->
+        <a href="{% url 'staff_orders' %}?tab=Preparing" class="stat-card-nav {% if active_tab == 'Preparing' or active_tab == 'Ready' %}active{% endif %}">
+            <h3 class="stat-title">Preparing</h3>
+            <p class="stat-number">{{ preparing|add:ready }}</p>
+        </a>
+
+        <!-- Completed Orders -->
+        <a href="{% url 'staff_orders' %}?tab=Completed" class="stat-card-nav {% if active_tab == 'Completed' %}active{% endif %}">
+            <h3 class="stat-title">Completed</h3>
+            <p class="stat-number">{{ completed }}</p>
+        </a>
+
+        <!-- Total Sales Card -->
+        <div class="stat-card-admin">
+            <h3 class="stat-title">Total Sales</h3>
+            <p>₱ {{ total_sales|default:"0.00" }}</p>
+        </div>
+    </div>
+
+    <!-- Main Cards Grid -->
+    <div class="admin-dashboard-grid">
+
+        <!-- Sales Overview -->
+        <div class="sales-chart">
+            <h3>Sales Overview</h3>
+            <p style="color:#aaa; margin-top:100px; text-align:center;">[Chart visualization placeholder]</p>
+        </div>
+
+        <!-- Top Sales -->
+        <div class="top-sales-card">
+            <h3>Top Sales</h3>
+            <ul style="list-style: none; padding: 0;">
+                <li style="background:#fffbe8; padding:10px; border-radius:5px; margin-bottom:5px;"><span>Beef Caldereta</span> <span>₱ 500.00</span></li>
+                <li style="padding:8px 0;"><span>Pork Sinigang</span> <span>₱ 210.00</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

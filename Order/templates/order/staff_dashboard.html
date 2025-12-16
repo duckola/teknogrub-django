@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Dashboard{% endblock %}
+{% block extra_head %} <link rel="stylesheet" href="{% static 'css/admin_staff.css' %}"> {% endblock %}
+
+{% block content %}
+    <h2 class="page-title">Dashboard</h2>
+    
+    <div class="stats-grid">
+        <div class="stat-card highlight">
+            <h3>New Orders</h3>
+            <p class="number">{{ new_orders }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Preparing</h3>
+            <p class="number">{{ preparing }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Completed</h3>
+            <p class="number">{{ completed }}</p>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div style="display: flex; gap: 20px;">
+        <a href="{% url 'staff_orders' %}" class="btn-primary" style="flex: 1; text-align: center;">Manage Orders</a>
+        <a href="{% url 'inventory' %}" class="btn-primary" style="flex: 1; text-align: center; background: white; color: #550508;">Manage Inventory</a>
+    </div>
+{% endblock %}

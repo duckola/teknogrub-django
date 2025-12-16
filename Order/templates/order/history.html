@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}History{% endblock %}
+{% block content %}
+<div class="history-container" style="max-width: 900px; margin: 0 auto; color: white;">
+    <h2 class="page-title" style="color:white; margin-bottom: 10px;">Order History</h2>
+
+    <!-- TABS Aesthetic Fix -->
+    <div class="tabs-nav" style="display: flex; gap: 20px; border-bottom: 2px solid rgba(255,255,255,0.3); margin-bottom: 25px;">
+        <a href="?status=Ongoing" class="tab-btn-history {% if active_status == 'Ongoing' %}active{% endif %}" style="text-decoration: none;">Ongoing</a>
+        <a href="?status=Completed" class="tab-btn-history {% if active_status == 'Completed' %}active{% endif %}" style="text-decoration: none;">Completed</a>
+        <a href="?status=Cancelled" class="tab-btn-history {% if active_status == 'Cancelled' %}active{% endif %}" style="text-decoration: none;">Cancelled</a>
+    </div>
+
+    <!-- Order List -->
+    {% for order in orders %}
+        <div class="order-history-card" style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; color: #333;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <h3 style="margin: 0; color: #550508;">{{ order.canteen.name }}</h3>
+                <span style="font-weight: bold; color: {% if order.status == 'Pending' %}#FBCD36{% elif order.status == 'Completed' %}green{% else %}red{% endif %};">{{ order.status|upper }}</span>
+            </div>
+            <p style="color: #777; font-size: 0.9rem;">{{ order.created_at|date:"M d, Y h:i A" }}</p>
+
+            <ul style="margin: 10px 0; padding-left: 20px;">
+                {% for item in order.items.all %}
+                <li>{{ item.quantity }}x {{ item.menu_item_name }}</li>
+                {% endfor %}
+            </ul>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 10px;">
+                <span style="font-weight: bold; font-size: 1.1rem;">Total: ₱ {{ order.total_amount }}</span>
+                {% if order.status == 'Completed' %}
+                <a href="{% url 'reorder' order.id %}" class="btn-primary" style="padding: 8px 20px; font-size: 0.9rem; text-decoration: none; color: white; background-color: #007bff; border-color: #007bff; border-radius: .25rem;">Reorder</a>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p style="color: white; padding: 20px;">No orders found in this status.</p>
+    {% endfor %}
+</div>
+
+<style>
+    /* History Tab Aesthetic Fix */
+    .tab-btn-history {
+        color: rgba(255,255,255,0.7);
+        font-weight: 600;
+        padding: 10px 0;
+        transition: color 0.2s;
+    }
+    .tab-btn-history.active {
+        color: white;
+        border-bottom: 2px solid #FBCD36;
+        font-weight: 800;
+    }
+</style>
+{% endblock %}

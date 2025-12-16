@@ -1,0 +1,172 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/payment_modal.css' %}">
+
+<div class="modal-box-content">
+
+    <!-- Exit Button -->
+    <button onclick="closePaymentModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:1.5rem; cursor:pointer; color:#333;">&times;</button>
+
+    <h3>Payment Methods</h3>
+
+    <!-- LIST EXISTING PAYMENT METHODS -->
+    <div class="payment-methods-list">
+        {% for method in request.user.payment_methods.all %}
+        <div class="payment-card">
+            <div class="card-left">
+                {% if method.method_type == 'GCash' %}
+                    <img class="card-logo" src="https://upload.wikimedia.org/wikipedia/commons/5/52/GCash_logo.svg" alt="Gcash">
+                {% else %}
+                    <i class="fa-brands fa-cc-visa" style="font-size:30px; color:blue;"></i>
+                {% endif %}
+                <div class="card-info">
+                    <div class="card-title">
+                        {% if method.method_type == 'GCash' %}
+                            GCash {{ method.account_number|slice:":4" }} *** **{{ method.account_number|slice:"-2:" }}
+                        {% else %}
+                            Visa **** **** **** {{ method.masked_card_number }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-actions">
+                <a onclick="openDeleteConfirmationModal({{ method.id }})">
+                    <i class="fa-solid fa-trash"></i>
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <p style="text-align:center; color:#888;">No payment methods saved.</p>
+        {% endfor %}
+    </div>
+
+    <!-- ADD NEW PAYMENT METHOD FORM -->
+    <h3 class="section-header">Add Payment Method</h3>
+
+    <form method="POST" action="{% url 'add_payment_method' %}" id="payment-add-form" onsubmit="return validatePaymentForm()">
+        {% csrf_token %}
+
+        <!-- Tab selection for Card/GCash -->
+        <div class="payment-tabs">
+            <button type="button" onclick="showPaymentForm('card')" id="tab-card" class="tab-btn active">Credit/Debit Card</button>
+            <button type="button" onclick="showPaymentForm('gcash')" id="tab-gcash" class="tab-btn">GCash</button>
+        </div>
+
+        <input type="hidden" name="method_type" value="Card" id="payment-method-type">
+
+        <!-- Card Form Fields -->
+        <div id="card-fields">
+            <input type="text" name="card_number" id="card_number" class="styled-input" placeholder="Card Number (16 digits)" maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <div style="display:flex; gap:15px;">
+                <input type="text" name="expiry" id="expiry" class="styled-input" placeholder="MM/YY" maxlength="5" style="flex:1;" oninput="formatExpiry(this)">
+                <input type="text" name="cvv" id="cvv" class="styled-input" placeholder="CVV (3 digits)" maxlength="3" style="flex:1;" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+        </div>
+
+        <!-- GCash Form Fields -->
+        <div id="gcash-fields" style="display:none;">
+            <input type="text" name="gcash_number" id="gcash_number" class="styled-input" placeholder="GCash Mobile Number (09xxxxxxxxx)" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        </div>
+
+        <!-- Set as Default Checkbox -->
+        <label style="display:flex; align-items:center; gap:10px; font-size:0.9rem; color:#555 !important;">
+            <input type="checkbox" name="is_default" value="true" checked>
+            <span style="color:#555;">Set as Default</span>
+        </label>
+
+        <button type="submit" class="btn-add">Add</button>
+    </form>
+</div>
+
+<script>
+    // Functions for Modal Control
+    function openPaymentModal() {
+        document.getElementById('paymentModalOverlay').style.display = 'flex';
+    }
+    function closePaymentModal() {
+        document.getElementById('paymentModalOverlay').style.display = 'none';
+    }
+
+    // JS for the Delete Confirmation Modal
+    function openDeleteConfirmationModal(methodId) {
+        const deleteModal = document.getElementById('deleteConfirmationModal');
+        if (deleteModal) {
+            const confirmLink = document.getElementById('confirmDeleteLink');
+            if (confirmLink) {
+                confirmLink.href = '/payment/delete/' + methodId + '/';
+            }
+            deleteModal.classList.add('active');
+        }
+    }
+    function closeDeleteConfirmationModal() {
+        const deleteModal = document.getElementById('deleteConfirmationModal');
+        if (deleteModal) {
+            deleteModal.classList.remove('active');
+        }
+    }
+
+    // Initial State Setup
+    document.addEventListener('DOMContentLoaded', () => {
+        // Ensure the initial state is Card
+        showPaymentForm('card');
+    });
+
+    // Tab Switching Logic
+    function showPaymentForm(type) {
+        document.getElementById('payment-method-type').value = (type === 'card' ? 'Card' : 'GCash');
+        const cardFields = document.getElementById('card-fields');
+        const gcashFields = document.getElementById('gcash-fields');
+        const tabCard = document.getElementById('tab-card');
+        const tabGcash = document.getElementById('tab-gcash');
+
+        if (cardFields && gcashFields && tabCard && tabGcash) {
+            cardFields.style.display = (type === 'card' ? 'block' : 'none');
+            gcashFields.style.display = (type === 'gcash' ? 'block' : 'none');
+
+            tabCard.classList.toggle('active', type === 'card');
+            tabGcash.classList.toggle('active', type === 'gcash');
+        }
+    }
+
+    function formatExpiry(input) {
+        let value = input.value.replace(/\D/g, '');
+        if (value.length > 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2, 4);
+        }
+        input.value = value;
+    }
+
+    function validatePaymentForm() {
+        const methodType = document.getElementById('payment-method-type').value;
+
+        if (methodType === 'Card') {
+            const cardNumber = document.getElementById('card_number').value;
+            const expiry = document.getElementById('expiry').value;
+            const cvv = document.getElementById('cvv').value;
+
+            if (cardNumber.length !== 16) {
+                alert('Card number must be 16 digits.');
+                return false;
+            }
+            if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+                alert('Expiry date must be in MM/YY format.');
+                return false;
+            }
+            const month = parseInt(expiry.substring(0, 2));
+            if (month < 1 || month > 12) {
+                alert('Invalid month in expiry date.');
+                return false;
+            }
+            if (cvv.length !== 3) {
+                alert('CVV must be 3 digits.');
+                return false;
+            }
+        } else if (methodType === 'GCash') {
+            const gcashNumber = document.getElementById('gcash_number').value;
+            if (!/^09\d{9}$/.test(gcashNumber)) {
+                alert('GCash number must start with 09 and be 11 digits long.');
+                return false;
+            }
+        }
+        return true;
+    }
+</script>

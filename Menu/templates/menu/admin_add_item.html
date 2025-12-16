@@ -1,0 +1,92 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block title %}{% if item %}Edit Item{% else %}Add New Item{% endif %}{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/edit_item.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="edit-menu-item-page">
+    <div class="admin-card edit-item-card">
+        <div class="form-header">
+            <h1 class="form-title">
+                {% if item %}Edit Item: {{ item.name }}{% else %}Add New Item{% endif %}
+            </h1>
+            <label class="toggle-switch">
+                {{ form.is_available }}
+                <span>Available</span>
+            </label>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-grid">
+                <!-- Item Name -->
+                <div class="form-group full-width">
+                    <label for="id_name" class="form-label">Item Name</label>
+                    {{ form.name }}
+                </div>
+
+                <!-- Category -->
+                <div class="form-group">
+                    <label for="id_category" class="form-label">Category</label>
+                    {{ form.category }}
+                </div>
+
+                <!-- Canteen -->
+                <div class="form-group">
+                    <label for="id_canteen" class="form-label">Canteen</label>
+                    {{ form.canteen }}
+                </div>
+
+                <!-- Price -->
+                <div class="form-group">
+                    <label for="id_price" class="form-label">Price (₱)</label>
+                    {{ form.price }}
+                </div>
+
+                <!-- Description -->
+                <div class="form-group full-width">
+                    <label for="id_description" class="form-label">Description</label>
+                    {{ form.description }}
+                </div>
+
+                <!-- Ingredients -->
+                <div class="form-group full-width">
+                    <label for="id_ingredients" class="form-label">Ingredients (Comma separated)</label>
+                    {{ form.ingredients }}
+                </div>
+
+                <!-- Image Upload -->
+                <div class="form-group full-width">
+                    <label for="id_image_url" class="form-label">Item Image</label>
+                    {{ form.image_url }}
+                    <div class="image-preview-box" style="{% if item.image_url %}background-image: url('{{ item.image_url.url }}'); background-size: cover; background-position: center;{% endif %}">
+                        {% if not item.image_url %}
+                            <span>No Image Selected</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Inventory Fields -->
+                <div class="form-group">
+                    <label for="id_current_stock" class="form-label">Current Stock</label>
+                    {{ form.current_stock }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_threshold_level" class="form-label">Threshold Level</label>
+                    {{ form.threshold_level }}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="btn-row">
+                <a href="{% url 'inventory' %}" class="btn btn-cancel">Cancel</a>
+                <button type="submit" class="btn btn-save">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,133 @@
+/* --- CSS Variables and General Setup --- */
+:root {
+    --bg-red: #550508;
+    --button-yellow: #FBCD36;
+    --text-yellow: #FBD436;
+    --corner-radius: 9px;
+    --text-light: #ffffff;
+    --text-dark: #333333;
+    --text-secondary: #6c757d;
+    --form-bg: #f2f2f2;
+    --border-color: #ced4da;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text-dark);
+}
+
+/* --- Base Layout (from base.html) --- */
+.page-container {
+    min-height: 100vh;
+    background-color: var(--bg-red);
+    /* This creates the radial gradient and adds the logo */
+    background-image:
+        radial-gradient(circle at center, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.6) 100%),
+        url('../images/school_logo.png'); /* IMPORTANT: CHANGE THIS PATH */
+
+    background-size: cover, auto 60%; /* Control the size of the school logo */
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 2rem 4rem;
+    color: var(--text-light);
+    display: flex;
+    flex-direction: column;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.logo {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.logo-yellow {
+    color: var(--text-yellow);
+}
+
+.main-nav a {
+    color: var(--text-light);
+    text-decoration: none;
+    margin-left: 2rem;
+    font-weight: bold;
+    transition: color 0.2s ease-in-out;
+}
+
+.main-nav a:hover {
+    color: var(--text-yellow);
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* --- Mobile Responsiveness --- */
+
+/* For tablets and smaller devices (less than 992px wide) */
+@media (max-width: 992px) {
+    .page-container {
+        padding: 2rem; /* Reduce overall padding */
+    }
+
+    .login-grid {
+        grid-template-columns: 1fr; /* Switch to a single column layout */
+        gap: 2rem;
+    }
+
+    .login-split-layout, .auth-split-layout {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .welcome-text.right-align {
+        text-align: center;
+    }
+}
+
+/* For small mobile phones (less than 576px wide) */
+@media (max-width: 576px) {
+    .page-container {
+        padding: 1.5rem; /* Even less padding for small screens */
+    }
+
+    .main-header {
+        /* This makes the logo and nav link stack vertically */
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .main-nav a {
+        margin-left: 0; /* Remove the margin on the nav link */
+    }
+
+    .auth-card {
+        width: 100%;
+        padding: 30px 20px;
+    }
+
+    .welcome-text h1 {
+        font-size: 2.5rem;
+    }
+
+    .welcome-text p {
+        font-size: 1.2rem;
+    }
+}

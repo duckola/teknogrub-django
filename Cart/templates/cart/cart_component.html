@@ -1,0 +1,226 @@
+{% load static %}
+
+<button class="floating-basket-btn" id="open-basket-btn">
+    <img src="{% static 'images/basket_icon.png' %}">
+</button>
+
+<div class="basket-overlay" id="basket-overlay"></div>
+
+<!-- Sidebar -->
+<aside class="basket-sidebar" id="basket-sidebar">
+    <div class="basket-header">
+        <h3>My Basket</h3>
+    </div>
+
+    <div class="basket-body">
+        <p class="canteen-name">{{ request.session.canteen_name|default:"Main Canteen"|upper }} ORDER</p>
+
+        <ul class="basket-item-list" id="cart-list-container">
+            <p style="text-align:center; padding:20px; color:#888;">Loading cart...</p>
+        </ul>
+    </div>
+
+    <div class="basket-footer">
+        <div class="total-amount">
+            <span>Total Amount:</span>
+            <span id="cart-total-display">₱ 0.00</span>
+        </div>
+
+        <!-- PAYMENT OPTIONS -->
+        <div class="payment-options-container" style="margin-bottom: 20px;">
+            <label class="payment-option">
+                Cash
+                <input type="radio" name="payment_method" value="Cash" checked>
+                <span class="checkmark"></span>
+            </label>
+            {% for method in request.user.payment_methods.all %}
+            <label class="payment-option">
+                {{ method.method_type }}
+                <input type="radio" name="payment_method" value="{{ method.id }}">
+                <span class="checkmark"></span>
+            </label>
+            {% endfor %}
+        </div>
+
+        <button class="confirm-order-btn" id="placeOrderBtn">Place Order</button>
+    </div>
+</aside>
+
+<style>
+    /* ADD these styles to cart_component.css */
+    .payment-options-container { display: flex; flex-direction: column; gap: 10px; }
+    .payment-option {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f1f1f1;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        position: relative;
+    }
+    /* Simple radio button look */
+    .payment-option input[type="radio"] { opacity: 0; position: absolute; }
+    .checkmark {
+        height: 20px; width: 20px; background-color: #eee; border-radius: 50%;
+        position: relative;
+    }
+    .payment-option input:checked ~ .checkmark { background-color: #550508; border: 4px solid #FBCD36; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const openBtn = document.getElementById('open-basket-btn');
+    const sidebar = document.getElementById('basket-sidebar');
+    const overlay = document.getElementById('basket-overlay');
+
+    function openCart() {
+        if (sidebar && overlay) {
+            sidebar.classList.add('is-active');
+            overlay.classList.add('is-active');
+            loadCart();
+        }
+    }
+
+    function closeCart() {
+        if (sidebar && overlay) {
+            sidebar.classList.remove('is-active');
+            overlay.classList.remove('is-active');
+        }
+    }
+
+    if (openBtn) {
+        openBtn.addEventListener('click', openCart);
+    }
+    if (overlay) {
+        overlay.addEventListener('click', closeCart);
+    }
+
+    function loadCart() {
+        fetch('/api/cart/update/')
+            .then(response => response.json())
+            .then(data => {
+                const cartList = document.getElementById('cart-list-container');
+                const cartTotal = document.getElementById('cart-total-display');
+
+                if (cartList) {
+                    cartList.innerHTML = ''; // Clear existing items
+
+                    if (data.items.length === 0) {
+                        cartList.innerHTML = '<p style="text-align:center; padding:20px; color:#888;">Your cart is empty.</p>';
+                    } else {
+                        data.items.forEach(item => {
+                            const li = document.createElement('li');
+                            li.className = 'basket-item';
+                            li.innerHTML = `
+                                <img src="${item.img}" alt="${item.name}">
+                                <div class="item-details">
+                                    <p class="item-name">${item.name}</p>
+                                    <p class="item-price">₱ ${item.price.toFixed(2)}</p>
+                                </div>
+                                <div class="item-qty">
+                                    <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+                                    <span>${item.qty}</span>
+                                    <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+                                </div>
+                            `;
+                            cartList.appendChild(li);
+                        });
+                    }
+                }
+                if (cartTotal) {
+                    cartTotal.innerText = `₱ ${data.total.toFixed(2)}`;
+                }
+            })
+            .catch(error => {
+                console.error('Failed to load cart:', error);
+                const cartList = document.getElementById('cart-list-container');
+                if (cartList) {
+                    cartList.innerHTML = '<p style="text-align:center; padding:20px; color:red;">Failed to load cart.</p>';
+                }
+            });
+    }
+
+    window.addToCart = function(itemId, quantity, note) {
+        fetch('/api/cart/add/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                item_id: itemId,
+                quantity: quantity,
+                note: note
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Maybe show a small notification
+                loadCart(); // Reload cart to show the new item
+            } else {
+                alert(data.message || 'Failed to add item.');
+            }
+        });
+    }
+
+    window.changeQty = function(itemId, change) {
+        fetch('/api/cart/change_qty/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                item_id: itemId,
+                change: change
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success' || data.status === 'deleted') {
+                loadCart();
+            } else {
+                alert(data.message || 'Failed to update quantity.');
+            }
+        });
+    }
+
+    document.getElementById('placeOrderBtn').addEventListener('click', function() {
+        const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked');
+        if (!selectedPaymentMethod) {
+            alert('Please select a payment method.');
+            return;
+        }
+
+        const paymentMethodValue = selectedPaymentMethod.value;
+
+        fetch('/api/cart/checkout/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                payment_method: paymentMethodValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Order placed successfully!');
+                closeCart();
+                loadCart(); // To show empty cart
+            } else {
+                alert('Error placing order: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while placing the order.');
+        });
+    });
+});
+</script>

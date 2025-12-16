@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="auth-split-layout">
+
+    <div class="auth-card">
+        <h2 class="auth-title">Sign up to<br>TeknoGrub!</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-row">
+                <div class="input-wrapper half">
+                    <input type="text" name="first_name" placeholder="First Name" required>
+                </div>
+                <div class="input-wrapper half">
+                    <input type="text" name="last_name" placeholder="Last Name" required>
+                </div>
+            </div>
+
+            <div class="input-wrapper">
+                <input type="text" name="id_number" placeholder="ID Number" required>
+            </div>
+
+            <div class="input-wrapper">
+                <input type="email" name="email" placeholder="School Email" required>
+            </div>
+
+            <div class="input-wrapper relative">
+                <input type="password" name="password" placeholder="Create Password" id="id_password" required>
+                <i class="fa-solid fa-eye-slash toggle-pass" onclick="togglePassword()"></i>
+            </div>
+
+            <button type="submit" class="btn-yellow">Sign Up</button>
+        </form>
+
+        <p class="bottom-text">
+            Already have an account?
+            <a href="{% url 'login' %}">Log in here!</a>
+        </p>
+    </div>
+
+    <div class="welcome-text right-align">
+        <h1>Hungry? Sign up<br>now, teknoy!</h1>
+        <p>Skip the line, enjoy the grub. Sign up now and start ordering with ease.</p>
+    </div>
+
+</div>
+
+<script>
+    function togglePassword() {
+        const input = document.getElementById("id_password");
+        const icon = document.querySelector(".toggle-pass");
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace("fa-eye-slash", "fa-eye");
+        } else {
+            input.type = "password";
+            icon.classList.replace("fa-eye", "fa-eye-slash");
+        }
+    }
+</script>
+
+<style>
+    body {
+        background: linear-gradient(rgba(85, 5, 8, 0.9), rgba(85, 5, 8, 0.9)),
+                    url("{% static 'images/school_logo.png' %}");
+        background-size: cover, 800px;
+        background-position: center, center;
+        background-repeat: no-repeat, no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+        margin: 0;
+    }
+
+    .auth-split-layout {
+        display: flex;
+        justify-content: center;
+        gap: 100px;
+        align-items: center;
+        width: 100%;
+        max-width: 1400px;
+        padding: 0 50px;
+    }
+
+    .welcome-text h1 {
+        font-family: "Inter", sans-serif;
+        font-size: 4rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 20px;
+        color: white;
+    }
+    .welcome-text p { font-size: 1.5rem; opacity: 0.9; max-width: 500px; line-height: 1.4; }
+    .right-align { text-align: left; }
+
+    .auth-card {
+        background: white;
+        width: 500px;
+        padding: 40px;
+        border-radius: 15px;
+        color: #550508;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        text-align: center;
+    }
+
+    .auth-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #550508;
+        margin-bottom: 25px;
+        line-height: 1.2;
+    }
+
+    .form-row { display: flex; gap: 15px; }
+    .half { flex: 1; }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #D9D9D9; /* Specific Gray */
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        color: #333;
+        font-family: "Inter", sans-serif;
+    }
+
+    .input-wrapper input::placeholder { color: #777; }
+    .input-wrapper input:focus { outline: 2px solid #aaa; }
+
+    .relative { position: relative; }
+    .toggle-pass {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: #550508;
+        cursor: pointer;
+        font-size: 1.1rem;
+    }
+
+    .btn-yellow {
+        background: #FBCD36;
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 800;
+        color: #550508;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin-top: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .btn-yellow:hover { background: #eac124; }
+
+    .bottom-text { margin-top: 20px; font-size: 0.9rem; color: #333; }
+    .bottom-text a { color: #550508; font-weight: 800; text-decoration: underline; }
+</style>
+{% endblock %}

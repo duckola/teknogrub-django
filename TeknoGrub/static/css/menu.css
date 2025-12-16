@@ -1,0 +1,176 @@
+/* --- Reinforce Card Structure --- */
+
+.card-scroller {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+.card-scroller .card {
+    flex-shrink: 0; /* Prevents shrinking */
+    width: 250px;  /* Give it a fixed width in the popular scroller */
+}
+
+.dish-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s;
+    height: 280px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* IMAGE FIX - MUST BE PRESENT */
+.card img {
+    width: 100%;
+    height: 160px; /* Fixed height for image */
+    object-fit: cover; /* This is the key property for fixing stretching/size */
+}
+
+/* Favorite Star (Top Left) */
+.favorite {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: #A22025;
+    color: #FBCD36;
+    width: 35px; height: 35px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    z-index: 10;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 50% 100%, 0% 80%);
+}
+
+.details {
+    padding: 15px;
+    position: relative;
+    flex-grow: 1;
+}
+
+.food-name {
+    font-weight: 800;
+    color: #550508;
+    margin: 0 0 5px 0;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.price {
+    font-size: 0.9rem;
+    color: #777;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* Add Button (Bottom Right) */
+.add-cart {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: #FBCD36;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #550508;
+    font-size: 1.2rem;
+}
+
+
+.promo-container {
+    padding: 20px;
+}
+
+.promo-container .dish-grid { /* Re-use the grid system from menu.html */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+/* Re-apply card styling to promo items */
+.promo-container .card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    height: 350px; /* Slightly taller for more content */
+    display: flex;
+    flex-direction: column;
+}
+
+.promo-container .card img {
+    width: 100%;
+    height: 180px; /* Fixed height for image */
+    object-fit: cover;
+}
+
+.promo-container .details {
+    padding: 15px;
+}
+
+/* Promo Tag Styling */
+.promo-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #FBCD36; /* Yellow */
+    color: #550508; /* Maroon Text */
+    padding: 4px 10px;
+    font-weight: bold;
+    border-radius: 6px;
+    z-index: 10;
+}
+
+/* --- Menu Page Responsiveness --- */
+.dish-grid {
+    display: grid;
+    /* Adjust columns: On small screens, use 2 columns, otherwise fill based on size */
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+.card {
+    /* Ensure cards don't stretch too wide if there's only one row */
+    min-width: 180px;
+}
+
+/* Fixing Category Scroll Bar */
+.category-header {
+    /* Ensure category buttons don't overflow badly */
+    overflow-x: auto;
+    white-space: nowrap;
+}
+.cat-links {
+    /* Allow the links to scroll horizontally if they don't fit */
+    overflow-x: auto;
+    flex-wrap: nowrap;
+}
+.cat-links::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for aesthetics */
+}
+
+/* Cart Sidebar (Ensure it doesn't push content off-screen) */
+.basket-sidebar {
+    max-width: 90vw; /* Use viewport width on small screens */
+    right: 0; /* Anchor to the right edge */
+    bottom: 0; /* Anchor to the bottom edge */
+    max-height: 100vh;
+    border-radius: 0; /* Full edge pop-up */
+}

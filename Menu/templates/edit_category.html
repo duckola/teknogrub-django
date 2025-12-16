@@ -1,0 +1,353 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Category - TeknoGrub Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+      /* --- ADMIN THEME STYLES (Matching edit_item.html) --- */
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #4a0a18;
+        color: white;
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        width: 260px;
+        background-color: #5d0c1d;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid rgba(255,255,255,0.1);
+      }
+      .brand-logo h1 { color: white; margin-bottom: 30px; }
+      .brand-tekno { font-weight: bold; }
+      .brand-grub { color: #F4C430; font-weight: bold; }
+      .nav-list { list-style: none; }
+      .nav-link { color: white; text-decoration: none; display: flex; gap: 10px; padding: 10px; }
+      
+      /* MAIN CONTENT */
+      .main-content {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        justify-content: center;
+      }
+
+      /* FORM CONTAINER */
+      .form-card {
+        background: white;
+        color: #333;
+        width: 100%;
+        max-width: 1000px; /* Wider for the two columns */
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      }
+
+      .form-header {
+        border-bottom: 2px solid #5d0c1d;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .form-title {
+        color: #5d0c1d;
+        font-size: 1.8rem;
+        font-weight: bold;
+      }
+
+      .form-group { margin-bottom: 20px; }
+      .form-label {
+        display: block;
+        font-weight: bold;
+        color: #5d0c1d;
+        margin-bottom: 8px;
+      }
+      .form-input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: #f9f9f9;
+      }
+
+      /* Two Column Layout for Item Management */
+      .manage-items-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 30px;
+      }
+
+      .item-column {
+        background: #fdfdfd;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 20px;
+      }
+
+      .column-header {
+        font-weight: bold;
+        color: #5d0c1d;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .search-box {
+        margin-bottom: 15px;
+        position: relative;
+      }
+      .search-box i {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+      }
+      .search-input {
+        width: 100%;
+        padding: 8px 8px 8px 35px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+      }
+
+      /* Item Lists */
+      .item-list {
+        list-style: none;
+        max-height: 400px;
+        overflow-y: auto;
+        border-top: 1px solid #eee;
+      }
+
+      .item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        transition: background 0.2s;
+      }
+
+      .item-row:hover { background: #f5f5f5; }
+
+      .item-info { display: flex; align-items: center; gap: 10px; }
+      
+      /* Initial Circles (mimicking the colored boxes in your screenshot) */
+      .item-initial {
+        width: 32px;
+        height: 32px;
+        background: #F4C430; /* Grub Yellow */
+        color: #5d0c1d;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.8rem;
+      }
+      
+      .item-initial.orange { background: #FF9800; color: white; }
+      .item-initial.red { background: #E91E63; color: white; }
+      
+      .item-name { font-weight: 500; }
+
+      /* Action Buttons (Add/Remove) */
+      .btn-action {
+        border: none;
+        border-radius: 4px;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: bold;
+        transition: 0.2s;
+      }
+
+      .btn-remove {
+        background: #ffebee;
+        color: #c62828;
+      }
+      .btn-remove:hover { background: #ffcdd2; }
+
+      .btn-add {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .btn-add:hover { background: #c8e6c9; }
+
+      /* Main Form Buttons */
+      .btn-row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+      }
+
+      .btn {
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        font-size: 1rem;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-cancel {
+        background: #ccc;
+        color: #333;
+      }
+
+      .btn-save {
+        background: #F4C430;
+        color: #5d0c1d;
+      }
+      
+      .btn-save:hover { background: #e0b120; }
+
+    </style>
+  </head>
+  <body>
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand-logo"><h1><span class="brand-tekno">TEKNO</span><span class="brand-grub">GRUB</span></h1></div>
+        <ul class="nav-list">
+            <li><a href="{% url 'categories' %}" class="nav-link"><i class="fa-solid fa-arrow-left"></i> Back to Categories</a></li>
+            <li><a href="{% url 'inventory' %}" class="nav-link"><i class="fa-solid fa-box"></i> Inventory</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="form-card">
+        <div class="form-header">
+          <h1 class="form-title">
+            {% if category %}Edit Category: {{ category.name }}{% else %}Add Category{% endif %}
+          </h1>
+        </div>
+
+        <form method="POST">
+          {% csrf_token %}
+          
+          <!-- Category Name Input -->
+          <div class="form-group">
+            <label class="form-label">Category Name</label>
+            <input type="text" class="form-input" name="name" value="{{ category.name }}" placeholder="e.g. Rice & Noodles">
+          </div>
+
+          <!-- Item Management Section -->
+          <div class="manage-items-grid">
+            
+            <!-- Assigned Items Column -->
+            <div class="item-column">
+              <div class="column-header">
+                <span>Assigned Menu Items ({{ assigned_items|length }})</span>
+              </div>
+              <ul class="item-list">
+                <!-- Mock Data Loop for Preview -->
+                <li class="item-row">
+                  <div class="item-info">
+                    <div class="item-initial orange">PC</div>
+                    <span class="item-name">Pancit Canton</span>
+                  </div>
+                  <button type="button" class="btn-action btn-remove"><i class="fa-solid fa-minus"></i> Remove</button>
+                </li>
+                <li class="item-row">
+                  <div class="item-info">
+                    <div class="item-initial red">P</div>
+                    <span class="item-name">Pancit</span>
+                  </div>
+                  <button type="button" class="btn-action btn-remove"><i class="fa-solid fa-minus"></i> Remove</button>
+                </li>
+                <li class="item-row">
+                  <div class="item-info">
+                    <div class="item-initial red">S</div>
+                    <span class="item-name">Spaghetti w/ Meat Sauce</span>
+                  </div>
+                  <button type="button" class="btn-action btn-remove"><i class="fa-solid fa-minus"></i> Remove</button>
+                </li>
+                <li class="item-row">
+                  <div class="item-info">
+                    <div class="item-initial orange">PB</div>
+                    <span class="item-name">Palabok</span>
+                  </div>
+                  <button type="button" class="btn-action btn-remove"><i class="fa-solid fa-minus"></i> Remove</button>
+                </li>
+                <!-- End Mock Loop -->
+              </ul>
+            </div>
+
+            <!-- Available Items Column -->
+            <div class="item-column">
+              <div class="column-header">
+                <span>Assign More Items</span>
+              </div>
+              
+              <!-- Search Bar -->
+              <div class="search-box">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" class="search-input" placeholder="Search Menu Items...">
+              </div>
+
+              <ul class="item-list">
+                <!-- Mock Data Loop -->
+                <li class="item-row">
+                  <div class="item-info">
+                    <div class="item-initial">A</div>
+                    <span class="item-name">Adobo</span>
+                  </div>
+                  <button type="button" class="btn-action btn-add"><i class="fa-solid fa-plus"></i> Add</button>
+                </li>
+                <li class="item-row">
+                  <div class="item-info">
+                    <div class="item-initial orange">S</div>
+                    <span class="item-name">Sinigang</span>
+                  </div>
+                  <button type="button" class="btn-action btn-add"><i class="fa-solid fa-plus"></i> Add</button>
+                </li>
+                <li class="item-row">
+                  <div class="item-info">
+                    <div class="item-initial red">LK</div>
+                    <span class="item-name">Lechon Kawali</span>
+                  </div>
+                  <button type="button" class="btn-action btn-add"><i class="fa-solid fa-plus"></i> Add</button>
+                </li>
+                 <li class="item-row">
+                  <div class="item-info">
+                    <div class="item-initial">HH</div>
+                    <span class="item-name">Hot Hot Chicken</span>
+                  </div>
+                  <button type="button" class="btn-action btn-add"><i class="fa-solid fa-plus"></i> Add</button>
+                </li>
+                <!-- End Mock Loop -->
+              </ul>
+            </div>
+
+          </div>
+
+          <!-- Buttons -->
+          <div class="btn-row">
+            <a href="{% url 'categories' %}" class="btn btn-cancel">Cancel</a>
+            <button type="submit" class="btn btn-save">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+  </body>
+</html>

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load menu_tags %}
+{% block title %}Promos{% endblock %}
+
+{% block content %}
+<div class="promo-container">
+    <h2 class="page-title" style="color:white;">Current Promos</h2>
+
+    <div class="promo-list">
+        {% for promo in promos %}
+            {% for item in promo.applicable_items.all %}
+
+            <!-- PROMO ITEM CARD (Vertical Banner Style) -->
+            <article class="promo-item-card">
+                <!-- Image Banner -->
+                {% static 'images/food.png' as default_image_url %}
+                {% with item.image_url|default:default_image_url as image_path %}
+                    <img src="{{ image_path }}" alt="{{ item.name }}" class="promo-banner-img">
+                {% endwith %}
+
+                <div class="promo-tag" style="background:#FBCD36; color:#550508; padding: 5px 12px; font-weight:bold; border-radius: 5px; position:absolute; top:10px; left:10px;">
+                    {{ promo.discount_percent }}% OFF
+                </div>
+
+                <div class="promo-details">
+                    <p class="food-name">{{ item.name }}</p>
+
+                    <!-- Price Display: Old Price Strikethrough -->
+                    <p class="price old-price">₱ {{ item.price }}</p>
+
+                    <!-- New Discounted Price Calculation -->
+                    {% with discount_amount=item.price|mul:promo.discount_percent|div:100 %}
+                    <p class="price new-price">₱ {{ item.price|sub:discount_amount|floatformat:2 }}</p>
+                    {% endwith %}
+
+                    <button class="add-cart" onclick="addToCart({{ item.id }})"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </article>
+
+            {% endfor %}
+        {% empty %}
+            <p style="color:white; padding:20px;">No active promos at the moment.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    /* CSS to enforce the vertical banner look */
+    .promo-list {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+    .promo-item-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .promo-banner-img {
+        width: 100%;
+        height: 200px; /* Fixed height for banner effect */
+        object-fit: cover;
+    }
+    .promo-details {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .promo-details .food-name { font-weight: 800; color: #550508; }
+    .promo-details .price { margin: 0; }
+    .old-price { text-decoration: line-through; color: #888; font-size: 0.9rem; }
+    .new-price { color: #d32f2f; font-weight: 800; font-size: 1.2rem; }
+
+    /* Reusing add-cart button from menu.css */
+    .promo-item-card .add-cart {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+    }
+</style>
+{% endblock %}

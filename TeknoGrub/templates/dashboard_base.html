@@ -1,0 +1,231 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeknoGrub - {% block title %}Admin{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="{% static 'css/admin_staff.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+    <style>
+        /* --- CRITICAL LAYOUT FIXES --- */
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: #550508; /* Fallback background color */
+        }
+
+        /* 1. The Main Flex Container: Puts Sidebar & Content side-by-side */
+        .dashboard-app-container {
+            display: flex;
+            height: 100vh;       /* Occupy full viewport height */
+            width: 100%;
+            overflow: hidden;    /* Prevent scroll on the body itself */
+        }
+
+        /* 2. The Sidebar: Fixed width, sits on the left */
+        .dashboard-sidebar-admin {
+            width: 280px;        /* Fixed width for sidebar */
+            background-color: #550508; /* Brand Red */
+            color: white;
+            flex-shrink: 0;      /* Prevent sidebar from shrinking */
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;    /* Scrollable if menu is long */
+            z-index: 10;
+        }
+
+        /* 3. The Main Content: Takes up all remaining space */
+        .dashboard-content {
+            flex-grow: 1;        /* Grow to fill right side */
+            background-color: #f4f6f9; /* Light gray background for readability */
+            /* Note: If you want the content red like your screenshot, change to #550508 */
+            /* background-color: #550508; */
+            height: 100%;
+            overflow-y: auto;    /* Scrollable content area */
+            position: relative;
+        }
+
+        .content-wrapper {
+            padding: 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* --- SIDEBAR ELEMENT STYLES --- */
+
+        .sidebar-header-admin {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .logo-admin {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        .logo-yellow { color: #FBCD36; }
+
+        .user-profile-admin {
+            padding: 0 30px 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .user-profile-admin h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .user-profile-admin p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin: 0;
+        }
+
+        .nav-list-admin {
+            list-style: none;
+            padding: 0 15px;
+            margin: 0;
+        }
+
+        .nav-link-admin {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link-admin i {
+            width: 25px;
+            font-size: 1.1rem;
+            margin-right: 10px;
+        }
+
+        .nav-link-admin:hover, .nav-link-admin.is-active {
+            background-color: rgba(251, 205, 54, 0.15); /* Yellow tint */
+            color: #FBCD36; /* Yellow text */
+        }
+
+        .nav-link-admin.is-active {
+            font-weight: 700;
+            border-left: 4px solid #FBCD36;
+        }
+
+        .badge {
+            background-color: #FBCD36;
+            color: #550508;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: auto; /* Pushes badge to the right */
+            font-weight: 700;
+        }
+
+        .nav-link-admin.logout:hover {
+            background-color: rgba(255, 0, 0, 0.2);
+            color: #ffcccc;
+        }
+
+        {% block extra_head_styles %}{% endblock %}
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="dashboard-body">
+
+    <div class="dashboard-app-container">
+
+        <aside class="dashboard-sidebar-admin">
+            <div class="sidebar-header-admin">
+                <h1 class="logo-admin">TEKNO<span class="logo-yellow">GRUB</span></h1>
+            </div>
+
+            <div class="user-profile-admin">
+                <h3>{{ request.user.first_name|default:"Admin" }} {{ request.user.last_name }}</h3>
+                <p>{{ request.user.id_number|default:"Staff ID" }}</p>
+            </div>
+
+            <nav class="sidebar-nav-admin">
+                <ul class="nav-list-admin">
+
+                    {% comment %} ADMIN VIEW {% endcomment %}
+                    {% if request.user.is_superuser %}
+                        <li>
+                            <a href="{% url 'admin_dashboard' %}" class="nav-link-admin {% if request.resolver_match.url_name == 'admin_dashboard' %}is-active{% endif %}">
+                                <i class="fa-solid fa-chart-line"></i> Dashboard
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% comment %} STAFF/ADMIN: Orders {% endcomment %}
+                    <li>
+                        <a href="{% url 'staff_orders' %}" class="nav-link-admin {% if request.resolver_match.url_name == 'staff_orders' %}is-active{% endif %}">
+                            <i class="fa-solid fa-receipt"></i> Orders <span class="badge">{% if counts.pending %}{{ counts.pending }}{% endif %}</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#" class="nav-link-admin">
+                            <i class="fa-solid fa-bell"></i> Notifications <span class="badge">0</span>
+                        </a>
+                    </li>
+
+                    {% if request.user.is_superuser %}
+                        <li style="margin-top: 20px; padding-left: 20px; font-size: 0.8rem; text-transform: uppercase; opacity: 0.5; font-weight: 700;">Management</li>
+                        <li>
+                            <a href="{% url 'categories' %}" class="nav-link-admin {% if request.resolver_match.url_name == 'categories' %}is-active{% endif %}">
+                                <i class="fa-solid fa-tags"></i> Menu Categories
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'inventory' %}" class="nav-link-admin {% if request.resolver_match.url_name == 'inventory' %}is-active{% endif %}">
+                                <i class="fa-solid fa-box"></i> Inventory
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                        <a href="{% url 'settings' %}" class="nav-link-admin {% if request.resolver_match.url_name == 'settings' %}is-active{% endif %}">
+                            <i class="fa-solid fa-gear"></i> Settings
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'logout' %}" class="nav-link-admin logout">
+                            <i class="fa-solid fa-right-from-bracket"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="dashboard-content">
+            <div class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

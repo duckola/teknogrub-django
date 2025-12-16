@@ -1,0 +1,140 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block title %}Category Management{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/category.css' %}">
+    <style>
+        .delete-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 6000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .delete-modal-overlay.active {
+            display: flex;
+        }
+
+        .delete-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .delete-box h3 {
+            color: #550508;
+            font-size: 1.5rem;
+        }
+
+        .delete-box p {
+            color: #888;
+            margin-top: 10px;
+        }
+
+        .delete-box .btn-delete {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #d32f2f;
+            color: white;
+            text-decoration: none;
+        }
+
+        .delete-box .btn-cancel {
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="categories-page">
+    <div class="cat-header">
+        <h2 class="cat-title">Category Management</h2>
+    </div>
+    <div class="admin-card">
+        <div class="toolbar">
+            <div class="search-container">
+                <i class="fa-solid fa-search search-icon"></i>
+                <input
+                    class="search-input"
+                    placeholder="Filter by Category Name..."
+                    value="{{ request.GET.q }}"
+                    name="q"
+                />
+            </div>
+            <a href="{% url 'add_category' %}" class="btn-add">
+                <i class="fa-solid fa-plus"></i> Add New Category
+            </a>
+        </div>
+
+        <div class="categories-list">
+            {% if categories %}
+                {% for category in categories %}
+                <article class="category-card">
+                    <div class="category-header">
+                        <h2 class="category-title">{{ category.category_name }}</h2>
+                    </div>
+                    <div class="category-body">
+                        <p class="category-count">{{ category.item_count|default:0 }} Items</p>
+                    </div>
+                    <div class="category-actions">
+                        <a href="{% url 'edit_category' category.pk %}" class="action-link">Edit</a>
+                        <span class="action-separator">|</span>
+                        <button type="button" class="action-link delete-link" onclick="openDeleteConfirmationModal({{ category.pk }})">Delete</button>
+                    </div>
+                </article>
+                {% endfor %}
+            {% else %}
+                <p class="no-categories">No categories found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- DELETE Confirmation Modal -->
+<div id="deleteConfirmationModal" class="delete-modal-overlay">
+    <div class="delete-box">
+        <h3>Are you sure you want to delete this category?</h3>
+        <p>This action cannot be undone.</p>
+        <div style="margin-top:20px;">
+            <button onclick="closeDeleteConfirmationModal()" class="btn-cancel">Cancel</button>
+            <form id="deleteForm" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-delete">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openDeleteConfirmationModal(categoryId) {
+        const deleteModal = document.getElementById('deleteConfirmationModal');
+        if (deleteModal) {
+            const deleteForm = document.getElementById('deleteForm');
+            if (deleteForm) {
+                deleteForm.action = `/manage/categories/delete/${categoryId}/`;
+            }
+            deleteModal.classList.add('active');
+        }
+    }
+
+    function closeDeleteConfirmationModal() {
+        const deleteModal = document.getElementById('deleteConfirmationModal');
+        if (deleteModal) {
+            deleteModal.classList.remove('active');
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,162 @@
+.modal-box-content {
+    position: relative;
+}
+
+.modal-box-content h3 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #550508;
+    margin-bottom: 15px;
+}
+
+.payment-methods-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.payment-card {
+    background: #F8F8F8;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.card-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.card-logo {
+    width: 40px;
+    height: 30px;
+}
+
+.card-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-title {
+    font-weight: 700;
+    color: #550508;
+    font-size: 1rem;
+}
+
+.card-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.card-actions a {
+    color: #d32f2f;
+    cursor: pointer;
+}
+
+.section-header {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #3E0000;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+#payment-add-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.payment-tabs {
+    display: flex;
+    gap: 10px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background: white;
+}
+
+.tab-btn.active {
+    background: #FBCD36;
+    color: #550508;
+}
+
+.styled-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #f9f9f9;
+    box-sizing: border-box;
+}
+
+.btn-add {
+    background-color: #FBCD36;
+    color: #550508;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 6000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.delete-modal-overlay.active {
+    display: flex;
+}
+
+.delete-box {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.delete-box h3 {
+    color: #550508;
+    font-size: 1.5rem;
+}
+
+.delete-box p {
+    color: #888;
+    margin-top: 10px;
+}
+
+.delete-box .btn-delete {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background: #d32f2f;
+    color: white;
+    text-decoration: none;
+}
+
+.delete-box .btn-cancel {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 15px;
+    cursor: pointer;
+}

@@ -1,0 +1,540 @@
+        :root {
+            --maroon: #881337;
+            --red-700: #b91c1c;
+            --red-300: #fca5a5;
+            --yellow-primary: #ffb020;
+            --gray-bg: #f9fafb;
+            --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 256px;
+        }
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: #520000;
+  color: white;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  padding: 10px 25px;
+}
+
+.header .logo h1 {
+  margin: 0;
+  color: white;
+  font-size: 24px;
+  top: 28px;
+  left: 37px;
+  width: 307px;
+  font-family: "Inter-Bold", Helvetica;
+  font-weight: 700;
+  font-size: 48px;
+  letter-spacing: 0;
+}
+
+.header .logo span {
+  color: #f4ca2f;
+}
+
+.header-icons i {
+  color: white;
+  font-size: 20px;
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 350px;
+    /* Calculate height: 100% of screen minus the header height (approx 78px) */
+    height: calc(100vh - 78px);
+    position: fixed; /* Fixed keeps it in place while scrolling main content */
+    top: 78px;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: #520000;
+    z-index: 90; /* Ensure it stays above other content */
+}
+
+/* User section (top maroon) */
+.sidebar .user {
+    margin-top: 26px;
+    padding-left: 20px;
+  background-color: #520000;
+  color: #fff;
+  border-bottom: 1px solid #7a0000;
+}
+
+.sidebar .name {
+  font-family: "Inter-Bold", Helvetica;
+  font-weight: 700;
+  color: #fbd436;
+  font-size: 36px;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar .id {
+  color: #ffffff;
+  font-size: 16px;
+}
+
+/* Canteen Dropdown */
+/* 1. CANTEEN SELECTION CONTAINER */
+.canteen-selection {
+    position: relative;
+    /* This matches the margin of the menu-section below */
+    margin: 20px 20px 30px 20px;
+    padding: 0; /* Remove padding so width matches exactly */
+    z-index: 100;
+}
+
+/* The White Box Button */
+.canteen-box {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: background 0.2s;
+    width: 100%; /* Ensure it fills the container */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.canteen-box:hover {
+    background-color: #f2f2f2;
+}
+
+/* The Dropdown List */
+.canteen-dropdown {
+    display: none;
+    position: absolute;
+    top: 110%; /* Just below the button */
+    left: 0;   /* Align to left edge of the button */
+    width: 100%; /* Exact width of the button */
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    overflow: hidden;
+    z-index: 101;
+    animation: fadeIn 0.2s ease;
+}
+
+.canteen-box:hover {
+    background-color: #f2f2f2;
+}
+
+.canteen-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.canteen-icon { color: #550508; font-size: 22px; }
+.canteen-text { font-family: 'Inter', sans-serif; font-weight: 700; color: #550508; font-size: 18px; letter-spacing: -0.5px; }
+.canteen-arrow { color: #550508; font-weight: bold; font-size: 16px; transition: transform 0.3s; }
+
+/* Rotate arrow when open */
+.canteen-selection.open .canteen-arrow {
+    transform: rotate(180deg);
+}
+
+/* Show the dropdown when the parent has class 'open' */
+.canteen-selection.open .canteen-dropdown {
+    display: block;
+}
+
+.canteen-option {
+    padding: 15px 20px;
+    color: #550508;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.canteen-option:last-child { border-bottom: none; }
+.canteen-option:hover { background-color: #ffe5e5; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* White background starts here */
+.menu-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    margin: 0 20px 20px 20px; /* Top, Right, Bottom (20px), Left */
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+    flex-grow: 1;
+}
+
+.menu-section nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-section nav li {
+      font-size: 16px;
+  color: #520000;
+  cursor: pointer;
+  font-weight: 500;
+padding: 20px 0 20px 15px;
+}
+
+.menu-section nav li i {
+  margin-right: 8px;
+}
+
+.menu-section nav li.active {
+  background-image: linear-gradient(to right, maroon, firebrick);
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+
+/* MAIN CONTENT */
+.main-content {
+  margin-left: 400px;
+  padding: 20px;
+}
+
+.topbar {
+    margin-top: 26px;
+  display: flex;
+  gap: 10px;
+    height: 50px;
+}
+
+.topbar input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+}
+
+.topbar button {
+  background-color: #f4ca2f;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.scroll-container {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.popular {
+    margin-top: 20px;
+    background-color: white;
+    color: #550508;
+    padding: 10px;
+      border-radius: 9px;
+
+}
+
+.popular .h3 {
+    color: #550508;
+    margin: 10px;
+    padding: 10px;
+}
+.card {
+  background-color: #650000;
+  border-radius: 10px;
+  text-align: center;
+  padding: 10px;
+  width: 150px;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  width: 210px;
+  height: 281px;
+  position: relative;
+  padding: 10px;
+  flex-shrink: 0; /* keeps cards same width when scrolling */
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card img {
+  width: 100%;
+  height: 215px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.details {
+  flex-direction: column;
+  text-align: left;
+
+}
+
+.food-name {
+  top: 0;
+  left: 0;
+  font-family: "Inter-Bold", Helvetica;
+  font-weight: 700;
+  color: #550508;
+  font-size: 15px;
+  letter-spacing: 0;
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.price {
+  top: 24px;
+  left: 0;
+  width: 121px;
+  text-shadow: 0px 4px 4px #00000040;
+  opacity: 0.75;
+  font-family: "Inter-MediumItalic", Helvetica;
+  font-weight: 500;
+  font-style: italic;
+  color: #550508;
+  font-size: 13px;
+  letter-spacing: 0;
+  line-height: normal;
+  text-decoration: underline;
+}
+
+/* Favorite Star */
+.favorite {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: #b30000;
+  color: gold;
+  width: 26px;
+  height: 35px;
+    padding-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    border-radius: 9px; /* Adjust the radius to match your image */
+  cursor: pointer;
+clip-path: polygon(
+        0% 0%,        /* Top-left */
+        100% 0%,       /* Top-right */
+        100% 100%,
+    70% 100%,      /* Wider right side */
+    50% 80%,       /* Peak (unchanged) */
+    30% 100%,      /* Wider left side */
+    0% 100%
+);
+}
+
+/* Add to Cart (+) Button */
+.add-cart {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: #ffcc00;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-cart i {
+  color: #6a0000;
+  font-weight: bold;
+}
+
+
+
+/*categories*/
+
+.categorical-dishes {
+  margin-top: 30px;
+}
+
+.category-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.category-header .categories {
+  display: flex;
+  background: transparent;
+  overflow: hidden;
+    column-gap: 200px;
+
+}
+
+.category-header .category {
+    background: transparent;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.category-header .category.active {
+  background: white;
+  color: #6d0a0a;
+  font-weight: bold;
+    height: 50px;
+border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+}
+
+.arrow {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  margin: 0 15px;
+  cursor: pointer;
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+.category-holder {
+  background: white;
+  border-radius: 9px;
+  padding: 20px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.dish-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 210px);
+  gap: 20px;
+  justify-content: center;
+}
+
+.dish-grid .card {
+  width: 210px;
+  height: 281px;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.dish-grid .card img {
+  width: 100%;
+  height: 215px;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+}
+
+.dish-grid .favorite {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: #b30000;
+  color: gold;
+  width: 26px;
+  height: 35px;
+    padding-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    border-radius: 9px; /* Adjust the radius to match your image */
+  cursor: pointer;
+clip-path: polygon(
+        0% 0%,        /* Top-left */
+        100% 0%,       /* Top-right */
+        100% 100%,
+    70% 100%,      /* Wider right side */
+    50% 80%,       /* Peak (unchanged) */
+    30% 100%,      /* Wider left side */
+    0% 100%
+);
+}
+
+.dish-grid .details {
+  text-align: left;
+}
+
+.dish-grid .food-name {
+  font-weight: 600;
+  color: #2e0000;
+  font-size: 15px;
+}
+
+.dish-grid .price {
+  font-size: 13px;
+  color: #660000;
+  margin-bottom: 5px;
+  font-style: italic;
+}
+
+.dish-grid .add-cart {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background: #ffcc00;
+  color: #6d0a0a;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.card a img {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.card a img:hover {
+    transform: scale(1.05); /* Slight zoom effect */
+}
+
+
+.menu-section nav ul li a {
+    text-decoration: none; /* Removes the underline */
+    color: inherit;        /* Forces it to use the list item's color (Maroon/Black) */
+    display: flex;         /* Keeps the icon and text aligned nicely */
+    align-items: center;
+    gap: 10px;             /* Space between icon and text */
+    width: 100%;           /* Makes the whole row clickable */
+}
+
+/* 2. Make sure the text turns white when the tab is 'Active' */
+.menu-section nav ul li.active a {
+    color: #fff;
+}

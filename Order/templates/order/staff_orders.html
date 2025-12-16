@@ -1,0 +1,171 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block title %}Orders{% endblock %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/admin_staff.css' %}">
+    <style>
+        /* --- STAFF ORDERS KANBAN CSS (Matching Prototype) --- */
+        .staff-dashboard-layout { max-width: 1400px; margin: 0 auto; }
+        .panel-header { font-size: 1.3rem; font-weight: 800; color: #550508; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+
+        /* Top Status Switcher (Tabs within the list area) */
+        .tabs-nav-small { display: flex; gap: 30px; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+        .tab-small { text-decoration: none; color: #888; font-weight: 600; padding: 5px 0; transition: all 0.2s; }
+        .tab-small.active { color: #550508; border-bottom: 3px solid #FBCD36; }
+
+        /* Main Layout: List on Left, Details on Right */
+        .main-workspace-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        .order-list-panel, .order-details-panel { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #333; }
+        .order-list-panel { max-height: 70vh; overflow-y: auto; }
+
+        /* List Item Card Styling */
+        .list-item-card { background: #550508; color: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: background 0.2s; }
+        .list-item-card.selected { box-shadow: 0 0 0 3px #FBCD36; }
+        .order-number-display { font-weight: 800; font-size: 1.1rem; }
+        .customer-name-display { font-size: 0.9rem; opacity: 0.8; }
+        .status-pill-list { float: right; background: #FBCD36; color: #550508; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; }
+
+        /* Details Panel */
+        #empty-state { text-align: center; color: #888; padding-top: 50px; }
+        .detail-order-number { font-size: 2rem; font-weight: 800; color: #550508; margin-bottom: 5px; }
+        .detail-customer-name { font-size: 1.1rem; color: #555; margin-bottom: 20px; }
+        .detail-section-title { font-size: 1.1rem; font-weight: 700; color: #550508; margin-top: 15px; margin-bottom: 10px; }
+        .detail-item-list { list-style: disc; padding-left: 20px; font-size: 1rem; color: #444; }
+        .detail-meta-row { display: flex; justify-content: space-between; font-weight: 600; padding: 5px 0; }
+        .detail-actions-row { display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+        .btn-detail { padding: 12px 25px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; transition: transform 0.1s; }
+        .btn-accept { background: #FBCD36; color: #550508; }
+        .btn-decline { background: #dc3545; color: white; }
+        .btn-ready { background: #17a2b8; color: white; }
+        .btn-complete { background: #28a745; color: white; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="staff-orders-container">
+
+    <!-- TOP STATS (Now the Nav Links) -->
+    <div class="stats-row-nav">
+        <!-- Links now point to the correct URL names -->
+        <a href="{% url 'staff_orders' %}?tab=Pending" class="stat-card-nav {% if active_tab == 'Pending' %}active{% endif %}">
+            <h3 class="stat-title">New Orders</h3>
+            <p class="stat-number">{{ counts.pending }}</p>
+        </a>
+        <a href="{% url 'staff_orders' %}?tab=Preparing" class="stat-card-nav {% if active_tab == 'Preparing' or active_tab == 'Ready' %}active{% endif %}">
+            <h3 class="stat-title">Preparing</h3>
+            <p class="stat-number">{{ preparing|add:ready }}</p>
+        </a>
+        <a href="{% url 'staff_orders' %}?tab=Completed" class="stat-card-nav {% if active_tab == 'Completed' %}active{% endif %}">
+            <h3 class="stat-title">Completed</h3>
+            <p class="stat-number">{{ completed }}</p>
+        </a>
+    </div>
+
+    <!-- MAIN WORKSPACE (List on Left, Details on Right) -->
+    <div class="main-workspace-grid">
+
+        <!-- A. ORDER LIST (Left Panel) -->
+        <div class="order-list-panel">
+            <h3 class="panel-header">{{ active_tab }} Orders</h3>
+
+            <div class="tabs-nav-small">
+                <a href="{% url 'staff_orders' %}?tab=Pending" class="tab-small {% if active_tab == 'Pending' %}active{% endif %}">Pending</a>
+                <a href="{% url 'staff_orders' %}?tab=Preparing" class="tab-small {% if active_tab == 'Preparing' %}active{% endif %}">Preparing</a>
+                <a href="{% url 'staff_orders' %}?tab=Ready" class="tab-small {% if active_tab == 'Ready' %}active{% endif %}">Ready</a>
+                <a href="{% url 'staff_orders' %}?tab=Completed" class="tab-small {% if active_tab == 'Completed' %}active{% endif %}">Completed</a>
+            </div>
+
+            <div class="list-scroll">
+                {% for order in orders %}
+                <div class="order-item-card status-{{ order.status|lower }}"
+                     data-order-id="{{ order.id }}"
+                     onclick="showOrderDetails({{ order.id }})">
+                    <span class="order-number-display">TG-{{ order.id }}</span>
+                    <span class="customer-name-display">{{ order.user.first_name }} {{ order.user.last_name }}</span>
+                    <span class="status-pill-list">{{ order.status|upper }}</span>
+                </div>
+                {% empty %}
+                <p style="text-align:center; color:#888; padding:20px;">No {{ active_tab }} Orders.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- B. ORDER DETAILS (Right Panel) -->
+        <div class="order-details-panel" id="orderDetailsPanel">
+            <h3 class="panel-header">Order Details</h3>
+
+            <div id="empty-state">Select an order to view details</div>
+
+            {% for order in orders %}
+            <div id="order-detail-{{ order.id }}" class="detail-content" style="display:none;">
+                <h2 class="detail-order-number">TG-{{ order.id }}</h2>
+                <p class="detail-customer-name">{{ order.user.first_name }} {{ order.user.last_name }}</p>
+
+                <h4 class="detail-section-title">Items:</h4>
+                <ul class="detail-item-list">
+                    {% for item in order.items.all %}
+                    <li>{{ item.quantity }}x {{ item.menu_item_name }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h4 class="detail-section-title">Details:</h4>
+                <div class="detail-meta-row"><span>Payment:</span> <span class="meta-value">{{ order.payment_method|default:"Cash" }}</span></div>
+                <div class="detail-meta-row"><span>Pickup:</span> <span class="meta-value">{{ order.canteen.name }}</span></div>
+
+                <!-- Action Buttons -->
+                <div class="detail-actions-row">
+                    {% if order.status == 'Pending' %}
+                        <button class="btn-detail btn-accept" onclick="updateStatus({{ order.id }}, 'Preparing')">Accept</button>
+                        <button class="btn-detail btn-decline" onclick="updateStatus({{ order.id }}, 'Cancelled')">Decline</button>
+                    {% elif order.status == 'Preparing' %}
+                        <button class="btn-detail btn-ready" onclick="updateStatus({{ order.id }}, 'Ready')">Mark Ready</button>
+                    {% elif order.status == 'Ready' %}
+                        <button class="btn-detail btn-complete" onclick="updateStatus({{ order.id }}, 'Completed')">Complete Order</button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Master-Detail JavaScript Logic ---
+    function showOrderDetails(orderId) {
+        document.querySelectorAll('.detail-content').forEach(el => el.style.display = 'none');
+        document.getElementById('empty-state').style.display = 'none';
+
+        const selectedDetail = document.getElementById('order-detail-' + orderId);
+        if (selectedDetail) {
+            selectedDetail.style.display = 'block';
+        }
+
+        document.querySelectorAll('.list-item-card').forEach(el => el.classList.remove('selected'));
+        document.querySelector(`.list-item-card[data-order-id="${orderId}"]`).classList.add('selected');
+    }
+
+    function updateStatus(id, status) {
+        fetch('/staff/order/update/' + id + '/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+            body: JSON.stringify({'status': status})
+        })
+        .then(response => {
+             if (response.ok) {
+                 window.location.reload();
+             } else {
+                 response.json().then(data => alert(data.message));
+             }
+        })
+        .catch(error => console.error('Error during status update:', error));
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const firstOrder = document.querySelector('.list-item-card');
+        if (firstOrder) {
+            showOrderDetails(firstOrder.getAttribute('data-order-id'));
+        }
+    });
+</script>
+{% endblock %}

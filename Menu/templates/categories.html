@@ -1,0 +1,55 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block title %}Category Management{% endblock %}
+
+{% block content %}
+<div class="content-card">
+
+    <form method="GET" action="" class="toolbar">
+        <div class="search-container">
+            <i class="fa-solid fa-search search-icon"></i>
+            <input
+                type="text"
+                name="q"
+                class="search-input"
+                placeholder="Filter by Category Name..."
+                value="{{ request.GET.q }}"
+            >
+        </div>
+        <a href="{% url 'add_category' %}" class="btn-add">
+            <i class="fa-solid fa-plus"></i> Add New Category
+        </a>
+    </form>
+
+    <div class="categories-list">
+        {% if categories %}
+            {% for category in categories %}
+            <article class="category-card">
+                <div class="category-header">
+                    {% if category.image %}
+                        <img src="{{ category.image.url }}" alt="{{ category.category_name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-right: 15px;">
+                    {% else %}
+                        <img src="{% static 'images/food.png' %}" alt="Default Image" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; margin-right: 15px;">
+                    {% endif %}
+                    <h2 class="category-title">{{ category.category_name }}</h2>
+                </div>
+                <div class="category-body">
+                    <p class="category-count">{{ category.item_count }} Items</p>
+                </div>
+                <div class="category-actions">
+                    <a href="{% url 'edit_category' category.pk %}" class="action-link">Edit</a>
+                    <span style="color:#ccc;">|</span>
+                    <form action="{% url 'delete_category' category.pk %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="action-link delete-link" onclick="return confirm('Are you sure you want to delete this category?');">Delete</button>
+                    </form>
+                </div>
+            </article>
+            {% endfor %}
+        {% else %}
+            <p style="text-align:center; color:#777; margin-top:50px;">No categories found.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

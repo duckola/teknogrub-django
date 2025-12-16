@@ -1,0 +1,61 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block title %}Category Management{% endblock %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/admin_staff.css' %}">
+    <style>
+        /* Styles matching the category prototype */
+        .category-row-card {
+            background-color: #550508; /* Maroon Background */
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            transition: background 0.2s;
+        }
+        .category-row-card:hover { background: #7a202a; }
+
+        .cat-info h3 { margin: 0; font-size: 1.2rem; font-weight: 700; }
+        .cat-meta span { color: #ddd; font-size: 0.9rem; }
+        .cat-actions a { color: white; font-weight: bold; text-decoration: none; margin-left: 15px; }
+        .action-text.delete { color: #FFCCCC; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-table-container">
+    <div class="table-header-row">
+        <h2 class="page-title" style="margin:0;">Category Management</h2>
+        <a href="{% url 'add_category' %}" class="btn-primary" style="background:#28a745; color:white; text-decoration:none;">+ Add New Category</a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container" style="max-width: 400px; margin-bottom: 30px;">
+        <i class="fa-solid fa-search search-icon" style="color:#aaa;"></i>
+        <input type="text" class="search-input" placeholder="Filter by Category Name...">
+    </div>
+
+    <div class="categories-list">
+        {% for category in categories %}
+            <article class="category-row-card">
+                <div class="cat-info">
+                    <h3>{{ category.category_name }}</h3>
+                </div>
+                <div class="cat-meta">
+                    <span>{{ category.item_count }} Items</span>
+                </div>
+                <div class="cat-actions">
+                    <a href="{% url 'edit_category' category.pk %}" class="action-text">Edit</a>
+                    <span style="color:#ccc;">|</span>
+                    <a href="#" class="action-text delete">Delete</a>
+                </div>
+            </article>
+        {% empty %}
+            <p style="text-align:center; color:#ddd; margin-top:50px;">No categories found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

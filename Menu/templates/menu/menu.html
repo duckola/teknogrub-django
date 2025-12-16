@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Menu{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/menu.css' %}">
+    <link rel="stylesheet" href="{% static 'css/item_detail_modal.css' %}">
+    <style>
+        /* Add hover zoom effect */
+        .card:hover { transform: scale(1.03); }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <!-- Search Bar (Top) -->
+        <div class="search-bar-container">
+            <!-- FIX: ENTIRE FORM must wrap the button and the input for submission to work -->
+            <form method="GET" action="{% url 'menu' %}" style="display:flex; width:100%;">
+                <div class="search-input-box" style="flex-grow:1;">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" name="q" placeholder="Search..." id="globalSearch" />
+                </div>
+                <button type="submit" class="btn-yellow-small" style="height:48px; width:100px; margin-left:10px;">Search</button>
+            </form>
+        </div>
+
+    <!-- Popular Section (White Container) -->
+    <div class="content-box">
+        <h3 class="section-header">Most Popular</h3>
+        <div class="card-scroller">
+            {% for item in popular_items %}
+                {% include 'menu/item_card.html' with item=item %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Category Section -->
+    <div class="content-box mt-20">
+        <div class="category-nav">
+            <button class="nav-arrow"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="cat-links">
+                <a href="?category=All" class="cat-pill {% if active_category == 'All' %}active{% endif %}">All Menu</a>
+                {% for cat in categories %}
+                <a href="?category={{ cat.category_name }}" class="cat-pill {% if active_category == cat.category_name %}active{% endif %}">{{ cat.category_name }}</a>
+                {% endfor %}
+            </div>
+            <button class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+
+        <div class="dish-grid">
+            {% for item in menu_items %}
+                {% include 'menu/item_card.html' with item=item %}
+            {% empty %}
+                <p style="color:#550508; padding:20px;">No items found.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+<style>
+    /* Search */
+    .search-bar-container { display: flex; gap: 10px; margin-bottom: 25px; }
+    .search-input-box { flex: 1; background: rgba(255,255,255,0.2); padding: 12px 20px; border-radius: 8px; display: flex; align-items: center; color: white; }
+    .search-input-box input { background: transparent; border: none; color: white; width: 100%; margin-left: 10px; outline: none; font-size: 1rem; }
+    .search-input-box input::placeholder { color: rgba(255,255,255,0.7); }
+    .btn-yellow-small { background: #FBCD36; border: none; padding: 0 30px; border-radius: 8px; font-weight: bold; color: #550508; cursor: pointer; }
+
+    /* Content Boxes (White Backgrounds) */
+    .content-box { background: white; border-radius: 15px; padding: 25px; }
+    .mt-20 { margin-top: 20px; }
+    .section-header { color: #550508; font-weight: 800; font-size: 1.5rem; margin-bottom: 15px; }
+
+    /* Cards */
+    .dish-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+    .card-scroller { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px; }
+
+    /* Category Navigation */
+    .category-nav { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
+    .cat-links { display: flex; gap: 40px; }
+    .cat-pill { text-decoration: none; color: white; font-weight: bold; padding: 10px 20px; border-radius: 20px; transition: 0.2s; background: transparent; }
+    .content-box .cat-pill { color: #550508; opacity: 0.5; }
+    /* Fix: Since categories are inside white box, use maroon text */
+    .content-box .cat-pill.active { background: #550508; color: #FBCD36; opacity: 1; }
+    .nav-arrow { background: none; border: none; color: #550508; font-size: 1.2rem; cursor: pointer; }
+</style>
+
+<!-- Modal Popup Container -->
+<div id="itemDetailModal" class="modal-overlay">
+    <div class="detail-card-popup">
+        <div class="close-modal-btn" onclick="closeModal()">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+
+        <img src="" id="modalImg" class="popup-image" alt="">
+
+        <div class="popup-content">
+            <div class="popup-header-row">
+                <h1 class="popup-title" id="modalTitle"></h1>
+                <span class="popup-price" id="modalPrice"></span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <p class="popup-category" id="modalCategory"></p>
+                <span id="modalAvailability" style="display:none; padding: 4px 8px; background-color: #ff4444; color: white; border-radius: 4px; font-size: 12px; font-weight: bold;">Out of Stock</span>
+            </div>
+
+            <p class="popup-desc" id="modalDesc"></p>
+
+            <div class="section-title">Add-ons</div>
+            <div class="addon-row">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="addon-rice" onchange="updateModalTotal()">
+                    Rice
+                </label>
+                <span style="text-decoration: underline;">+ 15.00</span>
+            </div>
+
+            <!-- Take Out Checkbox -->
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
+                <input type="checkbox" id="takeout-check">
+                <label for="takeout-check" style="font-weight: 700; color: #550508;">Take out?</label>
+            </div>
+
+            <div class="section-title">Note</div>
+            <textarea class="note-area" id="modalNote" placeholder="Special requests..."></textarea>
+
+            <div class="popup-footer-row">
+                <div class="counter-box">
+                    <strong>Amount:</strong>
+                    <button class="qty-popup-btn" onclick="changeModalQty(-1)">-</button>
+                    <div class="qty-display" id="modalQty">1</div>
+                    <button class="qty-popup-btn" onclick="changeModalQty(1)">+</button>
+                </div>
+
+                <div>
+                    <strong>Total:</strong>
+                    <span class="total-display" id="modalTotalPrice"></span>
+                </div>
+            </div>
+
+            <button id="modalAddBtn" class="add-popup-btn">Add to Basket</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentModalBasePrice = 0;
+    let currentModalQty = 1;
+    let currentModalItemId = null;
+    const addonPrice = 15.00;
+
+    function openItemModal(id, name, price, desc, img, category, isAvailable) {
+        currentModalItemId = id;
+        currentModalBasePrice = parseFloat(price);
+        currentModalQty = 1;
+
+        document.getElementById('modalImg').src = img || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="500" height="200"%3E%3Crect fill="%23f0f0f0" width="500" height="200"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999" font-family="Arial" font-size="16"%3ENo Image%3C/text%3E%3C/svg%3E';
+        document.getElementById('modalTitle').innerText = name;
+        document.getElementById('modalPrice').innerText = '₱ ' + currentModalBasePrice.toFixed(2);
+        document.getElementById('modalDesc').innerText = desc || 'No description available.';
+        document.getElementById('modalCategory').innerText = category || 'Uncategorized';
+        document.getElementById('modalQty').innerText = currentModalQty;
+
+        const availabilitySpan = document.getElementById('modalAvailability');
+        const addBtn = document.getElementById('modalAddBtn');
+        if (isAvailable) {
+            availabilitySpan.style.display = 'none';
+            addBtn.disabled = false;
+            addBtn.style.opacity = 1;
+            addBtn.style.cursor = 'pointer';
+            addBtn.innerText = 'Add to Basket';
+        } else {
+            availabilitySpan.style.display = 'inline';
+            addBtn.disabled = true;
+            addBtn.style.opacity = 0.6;
+            addBtn.style.cursor = 'not-allowed';
+            addBtn.innerText = 'Out of Stock';
+        }
+
+        // Reset Add-ons/Notes
+        document.getElementById('addon-rice').checked = false;
+        document.getElementById('takeout-check').checked = false;
+        document.getElementById('modalNote').value = '';
+
+        updateModalTotal();
+        document.getElementById('itemDetailModal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('itemDetailModal').classList.remove('active');
+    }
+
+    function changeModalQty(change) {
+        currentModalQty += change;
+        if (currentModalQty < 1) currentModalQty = 1;
+        document.getElementById('modalQty').innerText = currentModalQty;
+        updateModalTotal();
+    }
+
+    function updateModalTotal() {
+        let total = currentModalBasePrice * currentModalQty;
+
+        const hasRice = document.getElementById('addon-rice').checked;
+        if (hasRice) {
+            total += (addonPrice * currentModalQty);
+        }
+
+        document.getElementById('modalTotalPrice').innerText = "₱ " + total.toLocaleString('en-US', {minimumFractionDigits: 2});
+    }
+
+    document.getElementById('modalAddBtn').addEventListener('click', function() {
+        const isTakeout = document.getElementById('takeout-check').checked;
+        const note = document.getElementById('modalNote').value;
+        let finalNote = note;
+        if (isTakeout) {
+            finalNote = (finalNote ? finalNote + " | " : "") + "Take Out";
+        }
+
+        addToCart(currentModalItemId, currentModalQty, finalNote);
+        closeModal();
+    });
+
+    document.getElementById('itemDetailModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+</script>
+{% endblock %}

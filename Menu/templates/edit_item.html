@@ -1,0 +1,239 @@
+w{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Item - TeknoGrub Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+      /* --- ADMIN THEME STYLES --- */
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #4a0a18;
+        color: white;
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        width: 260px;
+        background-color: #5d0c1d;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid rgba(255,255,255,0.1);
+      }
+      .brand-logo h1 { color: white; margin-bottom: 30px; }
+      .brand-tekno { font-weight: bold; }
+      .brand-grub { color: #F4C430; font-weight: bold; }
+      .nav-list { list-style: none; }
+      .nav-link { color: white; text-decoration: none; display: flex; gap: 10px; padding: 10px; }
+
+      /* MAIN CONTENT */
+      .main-content {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        justify-content: center;
+      }
+
+      /* FORM CONTAINER */
+      .form-card {
+        background: white;
+        color: #333;
+        width: 100%;
+        max-width: 800px;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      }
+
+      .form-header {
+        border-bottom: 2px solid #5d0c1d;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .form-title {
+        color: #5d0c1d;
+        font-size: 1.8rem;
+        font-weight: bold;
+      }
+
+      /* Form Grid */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .full-width { grid-column: span 2; }
+
+      .form-group { margin-bottom: 20px; }
+
+      .form-label {
+        display: block;
+        font-weight: bold;
+        color: #5d0c1d;
+        margin-bottom: 8px;
+      }
+
+      .form-input, .form-select, .form-textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: inherit;
+        background: #f9f9f9;
+      }
+
+      .form-textarea { resize: vertical; min-height: 100px; }
+
+      /* Image Upload Preview */
+      .image-preview-box {
+        width: 100%;
+        height: 150px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        margin-top: 10px;
+        background-size: cover;
+        background-position: center;
+      }
+
+      /* Buttons */
+      .btn-row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 30px;
+      }
+
+      .btn {
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        font-size: 1rem;
+      }
+
+      .btn-cancel {
+        background: #ccc;
+        color: #333;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .btn-save {
+        background: #F4C430;
+        color: #5d0c1d;
+      }
+
+      .btn-save:hover { background: #e0b120; }
+
+      /* Toggle Switch */
+      .toggle-switch {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand-logo"><h1><span class="brand-tekno">TEKNO</span><span class="brand-grub">GRUB</span></h1></div>
+        <ul class="nav-list">
+            <!-- Fixed Link: Back to Inventory -->
+            <li><a href="{% url 'inventory' %}" class="nav-link"><i class="fa-solid fa-arrow-left"></i> Back to Inventory</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="form-card">
+        <div class="form-header">
+          <h1 class="form-title">
+            {% if item %}Edit Item: {{ item.name }}{% else %}Add New Item{% endif %}
+          </h1>
+          <!-- Availability Toggle -->
+          <label class="toggle-switch">
+             <input type="checkbox" checked style="width:20px; height:20px; accent-color:#5d0c1d;">
+             <span style="color:#5d0c1d; font-weight:bold;">Available</span>
+          </label>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-grid">
+
+            <!-- Item Name -->
+            <div class="form-group full-width">
+              <label class="form-label">Item Name</label>
+              <input type="text" class="form-input" name="name" value="{{ item.name }}" placeholder="e.g. Biggest Beepstek">
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" name="category">
+                <option>Dish</option>
+                <option>Rice</option>
+                <option>Others</option>
+              </select>
+            </div>
+
+            <!-- Price -->
+            <div class="form-group">
+              <label class="form-label">Price (₱)</label>
+              <input type="number" class="form-input" name="price" value="{{ item.price }}" placeholder="0.00">
+            </div>
+
+            <!-- Description -->
+            <div class="form-group full-width">
+              <label class="form-label">Description</label>
+              <textarea class="form-textarea" name="description" placeholder="Describe the dish...">{{ item.description }}</textarea>
+            </div>
+
+            <!-- Ingredients -->
+             <div class="form-group full-width">
+              <label class="form-label">Ingredients (Comma separated)</label>
+              <input type="text" class="form-input" name="ingredients" placeholder="e.g. Beef, Onions, Soy Sauce">
+            </div>
+
+            <!-- Image Upload -->
+            <div class="form-group full-width">
+              <label class="form-label">Item Image</label>
+              <input type="file" class="form-input">
+              <div class="image-preview-box" style="background-image: url('{% static '/images/food.png' %}');">
+                {% if not item %}No Image Selected{% endif %}
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Buttons -->
+          <div class="btn-row">
+            <!-- Fixed Link: Cancel returns to Inventory -->
+            <a href="{% url 'inventory' %}" class="btn btn-cancel">Cancel</a>
+            <button type="submit" class="btn btn-save">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+  </body>
+</html>
